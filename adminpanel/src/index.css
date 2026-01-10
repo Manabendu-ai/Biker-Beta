@@ -4,5 +4,95 @@ body{
   margin: 0;
   padding: 0;
   font-family: 'poppins', sans-serif;
-  min-width: 100vh;
+  min-height: 100vh;
 }
+
+#wrapper {
+  overflow-x: hidden;
+}
+
+#sidebar-wrapper {
+  min-height: 100vh;
+  margin-left: -15rem;
+  transition: margin 0.25s ease-out;
+}
+
+#sidebar-wrapper .sidebar-heading {
+  padding: 0.875rem 1.25rem;
+  font-size: 1.2rem;
+}
+
+#sidebar-wrapper .list-group {
+  width: 15rem;
+}
+
+#page-content-wrapper {
+  min-width: 100vw;
+}
+
+body.sb-sidenav-toggled #wrapper #sidebar-wrapper {
+  margin-left: 0;
+}
+
+@media (min-width: 768px) {
+  #sidebar-wrapper {
+    margin-left: 0;
+  }
+  #page-content-wrapper {
+    min-width: 0;
+    width: 100%;
+  }
+  body.sb-sidenav-toggled #wrapper #sidebar-wrapper {
+    margin-left: -15rem;
+  }
+}
+
+.bike-bg {
+  min-height: 100vh;
+  background: 
+    linear-gradient(
+      rgba(0, 0, 0, 0.55),
+      rgba(0, 0, 0, 0.55)
+    ),
+    url("/src/assets/bike-bg.jpg") no-repeat center center / cover;
+
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 40px;
+}
+
+
+/* Glassmorphism effect */
+.glass-card {
+  background: rgba(20, 20, 20, 0.75);
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+  border-radius: 18px;
+  padding: 40px;
+  width: 80%;
+  max-width: 900px;
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.6);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+
+/* Inputs transparent */
+.glass-card input {
+  background: rgba(255, 255, 255, 0.08) !important;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  color: white;
+  padding: 12px 15px;
+  border-radius: 10px;
+}
+
+.glass-card input::placeholder {
+  color: rgba(255, 255, 255, 0.6);
+}
+
+.glass-card h3 {
+  color: white;
+  font-weight: 600;
+  margin-bottom: 30px;
+}
+
