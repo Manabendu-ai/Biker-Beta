@@ -6,6 +6,7 @@ import ViewBike from './pages/ViewBikes/ViewBike'
 import Orders from "./pages/Orders/Orders";  
 import Sidebar from './components/Sidebar/Sidebar'
 import Menubar from './components/Menubar/Menubar'
+import { ToastContainer } from 'react-toastify'
 
 const App = () => {
   const [sidebarVisible, setSidebarVisible] = useState(true);
@@ -18,6 +19,7 @@ const App = () => {
         <Sidebar sidebarVisible = {sidebarVisible}/>
           <div id="page-content-wrapper">
             <Menubar toggleSidebar = {toggleSidebar}/>
+            <ToastContainer/>
               <div className="container-fluid">
                   <Routes>
                     <Route path = "/add" element={<AddBike/>}></Route>

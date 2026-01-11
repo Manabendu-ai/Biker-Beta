@@ -1,4 +1,7 @@
 import React, { useState } from "react";
+import {assets} from "../../assets/assets"
+import { addBike } from "../../services/BikeService";
+import { toast } from "react-toastify";
 
 const AddBike = () => {
   const [form, setForm] = useState({
@@ -12,26 +15,107 @@ const AddBike = () => {
     year: "",
     incentives: "",
     price: "",
+    image: null,
   });
+
+  const [imagePreview, setImagePreview] = useState(null);
 
   const handleChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });
   };
 
-  const handleSubmit = () => {
-    const payload = {
-      bike_id: Number(form.bike_id),
-      bike_desp: [form.brand, form.model],
-      spec: [Number(form.mileage), Number(form.engine), Number(form.weight)],
-      state: form.state,
-      year: Number(form.year),
-      incentives: form.incentives.split(",").map((i) => i.trim()),
-      price: Number(form.price),
-    };
-
-    console.log(payload);
-    alert("Bike saved! Check console for payload.");
+  const handleImageChange = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      setForm({ ...form, image: file });
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setImagePreview(reader.result);
+      };
+      reader.readAsDataURL(file);
+    }
   };
+
+  const handleSubmit = async () => {
+  // Validate that image is selected
+  if (!form.image) {
+    toast.error("Please select an image!");
+    return;
+  }
+
+  // Create the bike object
+  const bikeData = {
+    bike_id: Number(form.bike_id),
+    bike_desp: [form.brand, form.model],
+    spec: [Number(form.mileage), Number(form.engine), Number(form.weight)],
+    state: form.state,
+    year: Number(form.year),
+    incentives: form.incentives.split(",").map((i) => i.trim()),
+    price: Number(form.price),
+  };
+
+  try {
+    await addBike(bikeData, form.image); 
+    setForm({
+        bike_id: "",
+        brand: "",
+        model: "",
+        mileage: "",
+        engine: "",
+        weight: "",
+        state: "",
+        year: "",
+        incentives: "",
+        price: "",
+        image: null,
+    });
+    setImagePreview(null); 
+} catch(e) {
+    toast.error("Error Adding bike!");
+    throw e;
+}
+
+//   // Create FormData
+//   const formData = new FormData();
+//   formData.append("bike", JSON.stringify(bikeData));
+//   formData.append("file", form.image);
+
+//   try {
+//     const response = await fetch("http://localhost:8080/api/bikes/", {
+//       method: "POST",
+//       body: formData,
+//     });
+
+//     if (response.ok) {
+//       const result = await response.json();
+//       console.log("Success:", result);
+//       alert("Bike added successfully!");
+      
+//       // Reset form
+//       setForm({
+//         bike_id: "",
+//         brand: "",
+//         model: "",
+//         mileage: "",
+//         engine: "",
+//         weight: "",
+//         state: "",
+//         year: "",
+//         incentives: "",
+//         price: "",
+//         image: null,
+//       });
+//       setImagePreview(null);
+//     } else {
+//       const errorText = await response.text();
+//       console.error("Error response:", errorText);
+//       alert("Failed to add bike: " + errorText);
+//     }
+//   } catch (error) {
+//     console.error("Error:", error);
+//     alert("Error adding bike: " + error.message);
+//   }
+};
 
   return (
     <>
@@ -82,6 +166,64 @@ const AddBike = () => {
           font-size: 28px;
         }
 
+        .image-upload-section {
+          display: flex;
+          justify-content: center;
+          margin-bottom: 30px;
+        }
+
+        .image-upload-wrapper {
+          position: relative;
+          width: 180px;
+          height: 180px;
+          border: 2px dashed rgba(255, 255, 255, 0.3);
+          border-radius: 15px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          cursor: pointer;
+          transition: all 0.3s ease;
+          background: rgba(255, 255, 255, 0.05);
+          overflow: hidden;
+        }
+
+        .image-upload-wrapper:hover {
+          border-color: rgba(102, 126, 234, 0.8);
+          background: rgba(255, 255, 255, 0.08);
+          transform: scale(1.02);
+        }
+
+        .upload-placeholder {
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          gap: 10px;
+          color: rgba(255, 255, 255, 0.6);
+        }
+
+        .upload-icon {
+          width: 60px;
+          height: 60px;
+          background: rgba(102, 126, 234, 0.2);
+          border-radius: 50%;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          font-size: 30px;
+        }
+
+        .upload-text {
+          font-size: 14px;
+          text-align: center;
+        }
+
+        .image-preview {
+          width: 100%;
+          height: 100%;
+          object-fit: cover;
+          border-radius: 13px;
+        }
+
         .form-grid {
           display: grid;
           grid-template-columns: repeat(2, 1fr);
@@ -95,7 +237,8 @@ const AddBike = () => {
           }
         }
 
-        .glass-card input {
+        .glass-card input[type="text"],
+        .glass-card input:not([type="file"]) {
           background: rgba(255, 255, 255, 0.08) !important;
           border: 1px solid rgba(255, 255, 255, 0.15);
           color: white !important;
@@ -146,6 +289,27 @@ const AddBike = () => {
           <h3>Add Bike</h3>
 
           <div>
+            <div className="image-upload-section">
+              <label htmlFor="image" className="image-upload-wrapper">
+                {imagePreview ? (
+                  <img src={imagePreview} alt="Preview" className="image-preview" />
+                ) : (
+                  <div className="upload-placeholder">
+                    <div className="upload-icon">📷</div>
+                    <div className="upload-text">Upload Bike Image</div>
+                  </div>
+                )}
+              </label>
+              <input
+                type="file"
+                name="image"
+                id="image"
+                accept="image/*"
+                onChange={handleImageChange}
+                style={{ display: 'none' }}
+              />
+            </div>
+
             <div className="form-grid">
               <input
                 name="bike_id"
